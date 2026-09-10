@@ -18,4 +18,3 @@ The first five levels are hand-built and untimed or generous, and each introduce
 Everything is drawn procedurally into a single canvas — no images, no fonts, no external requests. The 3D is not WebGL: it is a hand-rolled perspective projection, so the board's tilt is just a per-vertex height and the whole renderer costs a few hundred bytes. Depth sorting, the light the unicorn casts on the floor, and the seven-band rainbow trail all fall out of that same projection.
 
 Audio is synthesised with the Web Audio API at runtime. Each bead's pickup note is pitched by your new remainder against a major scale, so the sound tells you your colour too — useful if you cannot rely on hue. Every colour in the game is mirrored in text (mod n on the goal, the number on the unicorn, both remainders in the HUD).
-](https://gp01002-code.github.io/miss01/)
