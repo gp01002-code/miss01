@@ -180,14 +180,21 @@
             BXp = h.x + fx * 0.8; BY = h.y - 0.45; BZ = h.z + fz * 0.8;
             YW = Math.atan2(-fx, -fz);
           }
-          var src = se.inputSources, hd = [];
+          var src = se.inputSources, hd = [], sx2 = 0, sz2 = 0, stick = 0;
           for (i = 0; i < src.length; i++) {
+            var pad = src[i].gamepad;
+            if (pad && pad.axes && pad.axes.length > 3) {
+              var a2 = pad.axes[2], a3 = pad.axes[3];
+              if (Math.hypot(a2, a3) > 0.16) { sx2 = a2; sz2 = -a3; stick = 1; }
+            }
             if (!src[i].gripSpace) continue;
             var q = f.getPose(src[i].gripSpace, rf);
             if (q) { var m = q.transform.matrix;
               hd.push({ h: src[i].handedness, ux: m[4], uz: m[6], x: m[12], y: m[13], z: m[14] }); }
           }
-          if (hd.length) {
+          if (stick) {
+            P.ctl(Math.max(-1, Math.min(1, sx2 * 1.15)), Math.max(-1, Math.min(1, sz2 * 1.15)));
+          } else if (hd.length) {
             var rw;
             if (hd.length > 1) {
               var L = hd[0], R = hd[1];
@@ -196,9 +203,12 @@
               rw = { x: (L.ux + R.ux)/2 - (R.y - L.y)/sp*0.55, z: -(L.uz + R.uz)/2, n: 2 };
             } else rw = { x: hd[0].ux, z: -hd[0].uz, n: 1 };
             var ck = "c" + rw.n;
-            if (!cal[ck]) cal[ck] = rw;
-            P.ctl(Math.max(-1, Math.min(1, (rw.x - cal[ck].x)*2.8)),
-                  Math.max(-1, Math.min(1, (rw.z - cal[ck].z)*2.8)));
+            if (!cal[ck]) cal[ck] = { x: rw.x, z: rw.z };
+            // the board is yawed to face the player, so bring the tilt into its frame
+            var wx = (rw.x - cal[ck].x) * 2.8, wz = (rw.z - cal[ck].z) * 2.8;
+            var cw = Math.cos(YW), sw = Math.sin(YW);
+            P.ctl(Math.max(-1, Math.min(1, cw * wx - sw * wz)),
+                  Math.max(-1, Math.min(1, sw * wx + cw * wz)));
           }
           P.step(t);
           var S = P.state(), T = P.tilt(), M2 = P.mod(S.v), uc = rgb(M2);
