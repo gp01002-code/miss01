@@ -167,6 +167,9 @@
       }).then(function (rf) {
         se.requestAnimationFrame(function fn(t, f) {
           se.requestAnimationFrame(fn);
+          try { frame(t, f); } catch (err) {}
+        });
+        function frame(t, f) {
           var po = f.getViewerPose(rf);
           if (!po) return;
           fr++;
@@ -226,8 +229,9 @@
             bl(1);
             ob(GR, W/2, W/2, 1, W/2, 1, W/2, [0.42,0.36,0.9], 1, 0.5, gl.LINES);
             bl(0);
-            for (i = 0; i < S.w.length; i++)
-              ob(BX, S.w[i][0], S.w[i][1], 17, S.w[i][2], 17, S.w[i][3], [0.14,0.11,0.32], 0.1);
+            var ws = S.w || [];
+            for (i = 0; i < ws.length; i++)
+              ob(BX, ws[i][0], ws[i][1], 17, ws[i][2], 17, ws[i][3], [0.14,0.11,0.32], 0.1);
             var gc = rgb(S.lv.tg);
             bl(1);
             ob(BX, W-70, 70, 80, 26, 80, 26, gc, 1, S.st === 1 ? 0.4 : 0.22);
@@ -274,7 +278,7 @@
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, QD.i);
             gl.drawElements(gl.TRIANGLES, QD.c, gl.UNSIGNED_SHORT, 0);
           }
-        });
+        }
       });
     }, function () {});
   };
